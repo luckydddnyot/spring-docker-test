@@ -3,133 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>간편평가 — 프로토타입</title>
+<title>간편평가</title>
 <style>
   :root{
-    --base:#F4F5F2;
-    --ink:#1F2733;
-    --ink-soft:#5C6675;
-    --line:#E0E2DC;
-    --card:#FFFFFF;
-    --primary:#3D5A47;       /* 딥 그린: 평가·신뢰 */
-    --primary-soft:#5B7A65;
-    --primary-bg:#EDF2EE;
-    --amber:#B07A28;
-    --red:#B5432A;
-    --radius:12px;
+    --base:#F4F5F2; --ink:#1F2733; --ink-soft:#5C6675; --line:#E0E2DC; --card:#FFFFFF;
+    --primary:#3D5A47; --primary-soft:#5B7A65; --primary-bg:#EDF2EE; --amber:#B07A28; --red:#B5432A; --radius:12px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
-    background:var(--base);color:var(--ink);font-size:14px;line-height:1.55;
-  }
+  body{font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;background:var(--base);color:var(--ink);font-size:14px;line-height:1.55;}
   button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
   input,select,textarea{font:inherit;color:inherit}
   [hidden]{display:none !important}
 
-  /* ── Header ── */
-  header{
-    background:var(--ink);color:#EFF1ED;
-    padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
-  }
+  header{background:var(--ink);color:#EFF1ED;padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
   .brand{display:flex;align-items:baseline;gap:9px}
   .brand h1{font-size:17px;font-weight:800;letter-spacing:-.01em}
   .brand .tag{font-size:11px;color:#9AA4AE;border:1px solid #3A4450;border-radius:999px;padding:1px 9px}
-  .round-info{font-size:12px;color:#AEB7BF}
-  .round-info b{color:#E8EBE6}
+  .co-select{background:#2A333E;color:#EFF1ED;border:1px solid #3A4450;border-radius:8px;padding:6px 10px;font-size:13px}
   .view-tabs{margin-left:auto;display:flex;border:1px solid #3A4450;border-radius:9px;overflow:hidden}
-  .view-tabs button{padding:6px 16px;font-size:13px;color:#9AA4AE}
+  .view-tabs button{padding:6px 15px;font-size:13px;color:#9AA4AE}
   .view-tabs button.on{background:var(--primary);color:#fff;font-weight:700}
-  .demo-strip{
-    background:#FBF3E2;color:#8A6420;font-size:12px;text-align:center;padding:6px 12px;
-    border-bottom:1px solid #EBDDBC;
-  }
 
   .wrap{max-width:1080px;margin:0 auto;padding:22px 24px 48px}
   h2.sec{font-size:15px;font-weight:800;margin:4px 0 12px}
   .muted{color:var(--ink-soft);font-size:12px}
+  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .toolbar select,.toolbar input{border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:#fff}
 
-  /* ── 평가자: 대상자 카드 ── */
   .target-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-  .t-card{
-    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    padding:14px 16px;cursor:pointer;transition:border-color .12s, transform .08s;
-    display:flex;flex-direction:column;gap:8px;
-  }
+  .t-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:border-color .12s, transform .08s;display:flex;flex-direction:column;gap:8px;}
   .t-card:hover{border-color:var(--primary-soft);transform:translateY(-1px)}
   .t-card .top{display:flex;align-items:center;gap:10px}
-  .avatar{
-    width:38px;height:38px;border-radius:50%;background:var(--primary-bg);color:var(--primary);
-    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;
-  }
+  .avatar{width:38px;height:38px;border-radius:50%;background:var(--primary-bg);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;}
   .t-card .nm{font-weight:700}
   .t-card .pos{font-size:12px;color:var(--ink-soft)}
-  .badge{
-    font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;align-self:flex-start;
-  }
-  .badge.none{background:#F1F1EE;color:#8B9097}
-  .badge.draft{background:#FBF3E2;color:var(--amber)}
-  .badge.done{background:var(--primary-bg);color:var(--primary)}
+  .badge{font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;align-self:flex-start;}
+  .badge.NONE{background:#F1F1EE;color:#8B9097}
+  .badge.DRAFT{background:#FBF3E2;color:var(--amber)}
+  .badge.DONE{background:var(--primary-bg);color:var(--primary)}
   .mini-bar{height:5px;border-radius:99px;background:#EEEFEA;overflow:hidden}
   .mini-bar i{display:block;height:100%;background:var(--primary-soft);border-radius:99px}
 
-  /* ── 평가 폼 ── */
-  .form-head{
-    display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;
-  }
-  .back{font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:4px}
+  .form-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .back{font-size:13px;color:var(--ink-soft)}
   .back:hover{color:var(--ink)}
   .form-head .who{font-size:17px;font-weight:800}
   .form-head .who span{font-size:13px;font-weight:400;color:var(--ink-soft)}
-  .panel{
-    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    padding:18px 20px;margin-bottom:14px;
-  }
-  .panel h3{
-    font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:4px;
-  }
-  .panel h3 .w{
-    font-size:11px;font-weight:700;color:var(--primary);background:var(--primary-bg);
-    padding:1px 9px;border-radius:999px;
-  }
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;}
+  .panel h3{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .panel h3 .w{font-size:11px;font-weight:700;color:var(--primary);background:var(--primary-bg);padding:1px 9px;border-radius:999px;}
   .panel .desc{font-size:12px;color:var(--ink-soft);margin-bottom:12px}
-  .goal{
-    border-top:1px solid var(--line);padding:13px 0;
-  }
-  .goal:last-of-type{padding-bottom:2px}
+  .goal{border-top:1px solid var(--line);padding:13px 0;}
   .goal .g-top{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap}
   .goal .g-title{font-weight:700;font-size:13.5px}
   .goal .g-w{font-size:11px;color:var(--ink-soft)}
   .scale{display:flex;gap:6px;flex-wrap:wrap}
-  .scale button{
-    width:42px;height:34px;border:1px solid var(--line);border-radius:8px;background:#FAFAF8;
-    font-weight:700;font-size:13px;color:var(--ink-soft);transition:all .1s;
-  }
+  .scale button{width:42px;height:34px;border:1px solid var(--line);border-radius:8px;background:#FAFAF8;font-weight:700;font-size:13px;color:var(--ink-soft);transition:all .1s;}
   .scale button:hover{border-color:var(--primary-soft)}
   .scale button.on{background:var(--primary);border-color:var(--primary);color:#fff}
   .scale-label{font-size:11px;color:#9aa0a8;margin-top:4px}
-  .goal textarea, .panel textarea{
-    width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
-    background:#FCFCFA;margin-top:8px;resize:vertical;
-  }
-  textarea:focus, input:focus{outline:2px solid var(--primary-soft);outline-offset:-1px;background:#fff}
-  .comp-row{
-    display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding:11px 0;flex-wrap:wrap;
-  }
+  .panel textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#FCFCFA;margin-top:8px;resize:vertical;}
+  textarea:focus,input:focus{outline:2px solid var(--primary-soft);outline-offset:-1px;background:#fff}
+  .comp-row{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding:11px 0;flex-wrap:wrap;}
   .comp-row .c-name{width:150px;font-weight:700;font-size:13.5px;flex-shrink:0}
   .comp-row .c-desc{flex:1;min-width:180px;font-size:12px;color:var(--ink-soft)}
-
-  /* 종합 패널 */
   .summary-grid{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-  .score-box{
-    text-align:center;background:var(--primary-bg);border-radius:var(--radius);padding:14px 22px;
-  }
+  .score-box{text-align:center;background:var(--primary-bg);border-radius:var(--radius);padding:14px 22px;}
   .score-box .v{font-size:30px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums}
   .score-box .l{font-size:11px;color:var(--primary-soft);font-weight:700}
-  .grade-chip{
-    width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-    font-size:24px;font-weight:800;color:#fff;background:var(--primary);
-  }
+  .grade-chip{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;background:var(--primary);}
   .calc-note{font-size:12px;color:var(--ink-soft)}
   .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
   .btn{padding:9px 20px;border-radius:9px;font-size:13.5px;font-weight:700}
@@ -138,99 +80,87 @@
   .btn.ghost{border:1px solid var(--line);color:var(--ink-soft);background:#fff}
   .btn.ghost:hover{border-color:#B9BCB4;color:var(--ink)}
 
-  /* ── 관리자 대시보드 ── */
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
-  .kpi{
-    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    padding:14px 16px;
-  }
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;}
   .kpi .v{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
   .kpi .l{font-size:12px;color:var(--ink-soft)}
-  .kpi.hl .v{color:var(--primary)}
-  .kpi.warn .v{color:var(--red)}
+  .kpi.hl .v{color:var(--primary)} .kpi.warn .v{color:var(--red)}
   .big-bar{height:10px;border-radius:99px;background:#E8E9E3;overflow:hidden;margin:6px 0 18px}
   .big-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary-soft),var(--primary))}
-  .adm-table{
-    width:100%;border-collapse:collapse;background:var(--card);
-    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;font-size:13px;
-  }
+  .adm-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;font-size:13px;}
   .adm-table th,.adm-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
   .adm-table thead th{background:#EFF0EA;font-size:12px;color:var(--ink-soft);font-weight:700}
   .adm-table tr:last-child td{border-bottom:none}
   .adm-table .pb{display:flex;align-items:center;gap:8px}
   .adm-table .pb .mini-bar{flex:1;min-width:70px}
-  .adm-table .pb .pct{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums;width:60px}
+  .adm-table .pb .pct{font-size:12px;color:var(--ink-soft);width:60px}
   .pending-names{font-size:12px;color:var(--red)}
-  .nudge{
-    font-size:12px;font-weight:700;color:var(--primary);border:1px solid var(--primary-soft);
-    border-radius:999px;padding:2px 12px;
-  }
-  .nudge:hover{background:var(--primary-bg)}
   .dist{display:flex;gap:10px;align-items:flex-end;height:120px;margin:8px 0 4px;padding:0 4px}
   .dist .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%}
   .dist .bar i{width:100%;max-width:64px;background:var(--primary-soft);border-radius:8px 8px 0 0;min-height:4px}
   .dist .bar.top i{background:var(--primary)}
-  .dist .bar .g{font-weight:800;font-size:13px}
-  .dist .bar .n{font-size:11px;color:var(--ink-soft)}
+  .dist .bar .g{font-weight:800;font-size:13px} .dist .bar .n{font-size:11px;color:var(--ink-soft)}
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media (max-width:820px){.two-col{grid-template-columns:1fr}}
   .dl-row{display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px;flex-wrap:wrap;gap:8px}
+
+  /* 슈퍼어드민 */
+  .co-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .co-card .co-name{font-weight:800;font-size:15px;min-width:140px}
+  .type-toggle{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700}
+  .type-toggle input{width:17px;height:17px;accent-color:var(--primary)}
+  .add-co{display:flex;gap:8px;margin-top:10px}
+  .add-co input{flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <h1>간편평가</h1>
-    <span class="tag">PROTOTYPE</span>
-  </div>
-  <div class="round-info"><b>2026년 상반기 정기평가</b> · 평가기간 6.15 ~ 6.30</div>
+  <div class="brand"><h1>간편평가</h1><span class="tag">v1</span></div>
+  <select id="companySelect" class="co-select"></select>
   <div class="view-tabs">
-    <button id="tabEval" class="on">평가자 화면</button>
-    <button id="tabAdmin">관리자 대시보드</button>
+    <button id="tabEval" class="on">평가자</button>
+    <button id="tabAdmin">관리자</button>
+    <button id="tabSuper">슈퍼어드민</button>
   </div>
 </header>
-<div class="demo-strip">🔍 화면 컨펌용 프로토타입입니다 — 데모 데이터로 동작하며 저장되지 않습니다.</div>
 
 <div class="wrap">
 
-  <!-- ══════ 평가자: 대상 목록 ══════ -->
+  <!-- 평가자: 대상 목록 -->
   <div id="evalList">
-    <h2 class="sec">내 평가 대상 <span class="muted" id="myProgress"></span></h2>
+    <div class="toolbar">
+      <span class="muted">평가자</span>
+      <select id="evaluatorSelect"></select>
+      <span class="muted" id="myProgress"></span>
+    </div>
     <div class="target-grid" id="targetGrid"></div>
   </div>
 
-  <!-- ══════ 평가자: 입력 폼 ══════ -->
+  <!-- 평가자: 입력 폼 -->
   <div id="evalForm" hidden>
     <div class="form-head">
       <button class="back" id="backBtn">← 목록</button>
       <div class="who" id="formWho"></div>
     </div>
-
     <div class="panel">
-      <h3>업적 평가 <span class="w" id="wPerf">60%</span></h3>
-      <div class="desc">기초자료(목표)는 관리자가 등록하거나 CSV로 일괄 업로드합니다. 항목별 달성도를 평가하세요.</div>
+      <h3>업적 평가 <span class="w">60%</span></h3>
+      <div class="desc">항목별 달성도를 평가하세요. (1 미달 · 3 달성 · 5 초과달성)</div>
       <div id="goalArea"></div>
     </div>
-
     <div class="panel">
-      <h3>역량 평가 <span class="w" id="wComp">40%</span></h3>
-      <div class="desc">행동 사례를 기준으로 평가하세요. (1 미흡 ~ 5 탁월)</div>
+      <h3>역량 평가 <span class="w">40%</span></h3>
+      <div class="desc">행동 사례 기준으로 평가하세요. (1 미흡 ~ 5 탁월)</div>
       <div id="compArea"></div>
     </div>
-
     <div class="panel">
       <h3>종합</h3>
       <div class="summary-grid">
         <div class="score-box"><div class="v" id="totalScore">-</div><div class="l">종합점수</div></div>
         <div class="grade-chip" id="gradeChip">-</div>
-        <div class="calc-note">
-          종합점수 = 업적(가중평균) × 60% + 역량(평균) × 40%<br>
-          등급 환산: 4.5↑ S · 4.0↑ A · 3.0↑ B · 2.0↑ C · 미만 D<br>
-          <span class="muted">※ 가중치·등급 기준은 관리자 설정에서 변경 가능 (예정)</span>
-        </div>
+        <div class="calc-note">종합 = 업적(가중평균)×60% + 역량(평균)×40%<br>4.5↑S · 4.0↑A · 3.0↑B · 2.0↑C · 미만 D</div>
       </div>
-      <textarea id="overallComment" rows="3" placeholder="종합 의견 (피평가자 강점·개선점, 차기 기대사항 등)"></textarea>
+      <textarea id="overallComment" rows="3" placeholder="종합 의견"></textarea>
       <div class="form-actions">
         <button class="btn ghost" id="saveDraftBtn">임시저장</button>
         <button class="btn primary" id="submitBtn">제출</button>
@@ -238,7 +168,7 @@
     </div>
   </div>
 
-  <!-- ══════ 관리자 대시보드 ══════ -->
+  <!-- 관리자 -->
   <div id="adminView" hidden>
     <h2 class="sec">제출 현황</h2>
     <div class="kpis">
@@ -249,30 +179,27 @@
     </div>
     <div class="muted" id="overallPct"></div>
     <div class="big-bar"><i id="overallBar" style="width:0%"></i></div>
-
     <h2 class="sec">평가자별 진행</h2>
-    <table class="adm-table">
-      <thead><tr>
-        <th>평가자</th><th>대상</th><th style="width:30%">진행</th><th>미제출 대상</th><th></th>
-      </tr></thead>
-      <tbody id="evaluatorRows"></tbody>
-    </table>
-
+    <table class="adm-table"><thead><tr><th>평가자</th><th>대상</th><th style="width:30%">진행</th><th>미제출 대상</th></tr></thead><tbody id="evaluatorRows"></tbody></table>
     <div style="height:22px"></div>
     <div class="two-col">
+      <div class="panel" style="margin:0"><h3>등급 분포 <span class="muted">(제출분)</span></h3><div class="dist" id="distChart"></div></div>
       <div class="panel" style="margin:0">
-        <h3>등급 분포 <span class="muted">(제출분 기준)</span></h3>
-        <div class="dist" id="distChart"></div>
+        <div class="dl-row"><h3>결과 집계</h3><button class="btn ghost" id="csvBtn">⬇ CSV</button></div>
+        <table class="adm-table" style="border-radius:8px"><thead><tr><th>피평가자</th><th>업적</th><th>역량</th><th>종합</th><th>등급</th></tr></thead><tbody id="resultRows"></tbody></table>
       </div>
-      <div class="panel" style="margin:0">
-        <div class="dl-row">
-          <h3>결과 집계</h3>
-          <button class="btn ghost" id="csvBtn">⬇ CSV 다운로드</button>
-        </div>
-        <table class="adm-table" style="border-radius:8px">
-          <thead><tr><th>피평가자</th><th>업적</th><th>역량</th><th>종합</th><th>등급</th></tr></thead>
-          <tbody id="resultRows"></tbody>
-        </table>
+    </div>
+  </div>
+
+  <!-- 슈퍼어드민 -->
+  <div id="superView" hidden>
+    <h2 class="sec">회사별 평가유형 설정 <span class="muted">— 각 회사가 사용할 평가유형을 켜고 끕니다</span></h2>
+    <div id="companyAdmin"></div>
+    <div class="panel" style="margin-top:6px">
+      <h3>회사 추가</h3>
+      <div class="add-co">
+        <input id="newCoName" placeholder="회사명 입력">
+        <button class="btn primary" id="addCoBtn">추가</button>
       </div>
     </div>
   </div>
@@ -280,241 +207,181 @@
 </div>
 
 <script>
-/* ───────── 데모 데이터 ───────── */
-const COMPS = [
-  ['직무 전문성','담당 직무의 지식·기술을 갖추고 품질 높은 결과물을 내는가'],
-  ['문제 해결','이슈를 구조적으로 분석하고 실행 가능한 해결안을 만드는가'],
-  ['협업','동료·유관부서와 신뢰를 바탕으로 협력하는가'],
-  ['커뮤니케이션','명확하게 전달하고 경청하며 보고가 적시에 이뤄지는가'],
-  ['주도성','지시 없이도 개선점을 찾아 실행하는가'],
-];
-const W_PERF = 0.6, W_COMP = 0.4;
+const $ = id => document.getElementById(id);
+async function api(url, opts){ const r = await fetch(url, opts); if(!r.ok) throw new Error(await r.text()); return r.json(); }
+const TYPE_LABEL = { HR:'인사 성과평가', PROJECT:'프로젝트 평가' };
 
-// 피평가자: goals [제목, 가중치%], scores: {perf:[..], comp:[..], comment}, status
-const targets = [
-  { id:'e1', name:'김민서', dept:'영업1팀', pos:'대리', evaluator:'박팀장',
-    goals:[['신규 거래처 5개사 발굴',40],['기존 고객 갱신율 90% 달성',40],['CRM 데이터 정비',20]],
-    status:'done', perf:[5,4,4], comp:[4,4,5,4,4], comment:'목표 초과 달성. 협업 태도 우수.' },
-  { id:'e2', name:'이준호', dept:'영업1팀', pos:'사원', evaluator:'박팀장',
-    goals:[['월 방문 상담 30건',50],['제안서 품질 개선',30],['영업 교육 이수',20]],
-    status:'draft', perf:[3,4,null], comp:[3,3,4,4,null], comment:'' },
-  { id:'e3', name:'정수아', dept:'경영지원팀', pos:'과장', evaluator:'박팀장',
-    goals:[['결산 기한 100% 준수',50],['비용 절감 과제 2건',30],['신규 ERP 정착 지원',20]],
-    status:'none', perf:[null,null,null], comp:[null,null,null,null,null], comment:'' },
-  { id:'e4', name:'최현우', dept:'개발팀', pos:'대리', evaluator:'김실장',
-    goals:[['서비스 장애율 0.1% 이하',40],['신규 기능 3건 출시',40],['코드리뷰 문화 정착',20]],
-    status:'done', perf:[4,5,4], comp:[5,4,4,3,5], comment:'기술 리더십 돋보임.' },
-  { id:'e5', name:'한지민', dept:'개발팀', pos:'사원', evaluator:'김실장',
-    goals:[['배포 자동화 구축',50],['테스트 커버리지 60%',30],['기술 블로그 2건',20]],
-    status:'none', perf:[null,null,null], comp:[null,null,null,null,null], comment:'' },
-  { id:'e6', name:'오세훈', dept:'마케팅팀', pos:'대리', evaluator:'김실장',
-    goals:[['리드 전환율 5% 달성',50],['콘텐츠 발행 월 8건',30],['브랜드 설문 NPS +10',20]],
-    status:'done', perf:[3,4,3], comp:[3,4,3,4,3], comment:'꾸준한 성과. 전환율 개선 여지.' },
-];
-// 데모: 현재 로그인 평가자 = 박팀장
-const ME = '박팀장';
-let current = null;
+const W_PERF=0.6, W_COMP=0.4;
+const f2 = n => (n==null)?'-':(Math.round(n*100)/100).toFixed(2);
+function gradeOf(t){ if(t==null)return '-'; return t>=4.5?'S':t>=4.0?'A':t>=3.0?'B':t>=2.0?'C':'D'; }
+function calcPerf(goals){ let s=0,w=0; goals.forEach(g=>{ if(g.score!=null){ s+=g.score*g.weight; w+=g.weight; }}); return w>0?s/w:null; }
+function calcComp(cs){ const v=cs.filter(c=>c.score!=null); return v.length? v.reduce((a,c)=>a+c.score,0)/v.length : null; }
 
-/* ───────── 점수 계산 ───────── */
-function perfScore(t){
-  let s=0, w=0;
-  t.goals.forEach((g,i)=>{ if(t.perf[i]!=null){ s+=t.perf[i]*g[1]; w+=g[1]; } });
-  return w>0 ? s/w : null;
-}
-function compScore(t){
-  const v = t.comp.filter(x=>x!=null);
-  return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
-}
-function totalScore(t){
-  const p=perfScore(t), c=compScore(t);
-  if(p==null || c==null) return null;
-  return p*W_PERF + c*W_COMP;
-}
-function grade(s){
-  if(s==null) return '-';
-  return s>=4.5?'S':s>=4.0?'A':s>=3.0?'B':s>=2.0?'C':'D';
-}
-const f1 = n => n==null?'-':(Math.round(n*100)/100).toFixed(2);
+let companies=[], companyId=null, allTargets=[], currentEvaluator='__ALL__', cur=null;
 
-/* ───────── 탭 ───────── */
+/* 탭 전환 */
 function show(view){
-  document.getElementById('evalList').hidden = view!=='list';
-  document.getElementById('evalForm').hidden = view!=='form';
-  document.getElementById('adminView').hidden = view!=='admin';
-  document.getElementById('tabEval').classList.toggle('on', view!=='admin');
-  document.getElementById('tabAdmin').classList.toggle('on', view==='admin');
+  $('evalList').hidden = view!=='list';
+  $('evalForm').hidden = view!=='form';
+  $('adminView').hidden = view!=='admin';
+  $('superView').hidden = view!=='super';
+  $('tabEval').classList.toggle('on', view==='list'||view==='form');
+  $('tabAdmin').classList.toggle('on', view==='admin');
+  $('tabSuper').classList.toggle('on', view==='super');
 }
-document.getElementById('tabEval').onclick = ()=>{ renderList(); show('list'); };
-document.getElementById('tabAdmin').onclick = ()=>{ renderAdmin(); show('admin'); };
-document.getElementById('backBtn').onclick = ()=>{ renderList(); show('list'); };
+$('tabEval').onclick = ()=>enterEvaluator();
+$('tabAdmin').onclick = ()=>enterAdmin();
+$('tabSuper').onclick = ()=>enterSuper();
+$('backBtn').onclick = ()=>enterEvaluator();
 
-/* ───────── 평가자: 목록 ───────── */
-const stMeta = { none:['미시작','none'], draft:['작성 중','draft'], done:['제출 완료','done'] };
+/* 초기화 */
+async function init(){
+  companies = await api('/api/companies');
+  const sel = $('companySelect');
+  sel.innerHTML = companies.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  if(companies.length){ companyId = companies[0].id; sel.value = companyId; }
+  sel.onchange = ()=>{ companyId = parseInt(sel.value,10); enterEvaluator(); };
+  enterEvaluator();
+}
+
+/* 평가자 화면 */
+async function enterEvaluator(){
+  show('list');
+  allTargets = await api(`/api/companies/${companyId}/targets`);
+  const evs = [...new Set(allTargets.map(t=>t.evaluatorName))];
+  if(!evs.includes(currentEvaluator)) currentEvaluator='__ALL__';
+  const es = $('evaluatorSelect');
+  es.innerHTML = `<option value="__ALL__">전체</option>` + evs.map(e=>`<option value="${e}">${e}</option>`).join('');
+  es.value = currentEvaluator;
+  es.onchange = ()=>{ currentEvaluator = es.value; renderList(); };
+  renderList();
+}
 function renderList(){
-  const mine = targets.filter(t=>t.evaluator===ME);
-  const done = mine.filter(t=>t.status==='done').length;
-  document.getElementById('myProgress').textContent = `· ${done}/${mine.length}명 제출 완료`;
-  const grid = document.getElementById('targetGrid');
-  grid.innerHTML = '';
-  mine.forEach(t=>{
-    const filled = t.perf.filter(x=>x!=null).length + t.comp.filter(x=>x!=null).length;
-    const total = t.perf.length + t.comp.length;
-    const card = document.createElement('div');
-    card.className = 't-card';
-    card.innerHTML = `
-      <div class="top">
-        <div class="avatar">${t.name[0]}</div>
-        <div><div class="nm">${t.name}</div><div class="pos">${t.dept} · ${t.pos}</div></div>
-      </div>
-      <span class="badge ${stMeta[t.status][1]}">${stMeta[t.status][0]}</span>
-      <div class="mini-bar"><i style="width:${Math.round(filled/total*100)}%"></i></div>`;
-    card.onclick = ()=>openForm(t);
-    grid.appendChild(card);
-  });
+  const list = allTargets.filter(t=> currentEvaluator==='__ALL__' || t.evaluatorName===currentEvaluator);
+  const done = list.filter(t=>t.status==='DONE').length;
+  $('myProgress').textContent = list.length? `· ${done}/${list.length}명 완료` : '· 대상 없음';
+  $('targetGrid').innerHTML = list.map(t=>`
+    <div class="t-card" onclick="openForm(${t.id})">
+      <div class="top"><div class="avatar">${(t.name||'?')[0]}</div>
+        <div><div class="nm">${t.name}</div><div class="pos">${t.dept} · ${t.position} · ${t.evaluatorName}</div></div></div>
+      <span class="badge ${t.status}">${({NONE:'미시작',DRAFT:'작성 중',DONE:'제출 완료'})[t.status]}</span>
+      <div class="mini-bar"><i style="width:${t.total? Math.round(t.filled/t.total*100):0}%"></i></div>
+    </div>`).join('') || '<div class="muted">평가 대상이 없습니다.</div>';
 }
 
-/* ───────── 평가자: 폼 ───────── */
-function scaleButtons(value, onPick){
-  const wrap = document.createElement('div');
-  wrap.className = 'scale';
-  for(let i=1;i<=5;i++){
-    const b = document.createElement('button');
-    b.textContent = i;
-    if(value===i) b.classList.add('on');
-    b.onclick = ()=>{ onPick(i); };
-    wrap.appendChild(b);
-  }
-  return wrap;
+/* 입력 폼 */
+function scaleHtml(value){
+  let h='<div class="scale">';
+  for(let i=1;i<=5;i++) h+=`<button data-v="${i}" class="${value===i?'on':''}">${i}</button>`;
+  return h+'</div>';
 }
-function openForm(t){
-  current = t;
-  document.getElementById('formWho').innerHTML =
-    `${t.name} <span>${t.dept} · ${t.pos} · 평가자: ${t.evaluator}</span>`;
-  // 업적
-  const ga = document.getElementById('goalArea');
-  ga.innerHTML = '';
-  t.goals.forEach((g,i)=>{
-    const div = document.createElement('div');
-    div.className = 'goal';
-    div.innerHTML = `<div class="g-top"><span class="g-title">${i+1}. ${g[0]}</span><span class="g-w">가중치 ${g[1]}%</span></div>`;
-    div.appendChild(scaleButtons(t.perf[i], v=>{ t.perf[i]=v; if(t.status==='none')t.status='draft'; openForm(t); }));
-    const lbl = document.createElement('div');
-    lbl.className='scale-label'; lbl.textContent='1 미달 · 3 달성 · 5 초과달성';
-    div.appendChild(lbl);
-    ga.appendChild(div);
+async function openForm(id){
+  cur = await api(`/api/targets/${id}`);
+  $('formWho').innerHTML = `${cur.name} <span>${cur.dept} · ${cur.position} · 평가자: ${cur.evaluatorName} · ${TYPE_LABEL[cur.evalType]||cur.evalType}</span>`;
+  const ga = $('goalArea'); ga.innerHTML='';
+  cur.goals.forEach((g,i)=>{
+    const d=document.createElement('div'); d.className='goal';
+    d.innerHTML=`<div class="g-top"><span class="g-title">${i+1}. ${g.title}</span><span class="g-w">가중치 ${g.weight}%</span></div>${scaleHtml(g.score)}`;
+    d.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ g.score=parseInt(b.dataset.v,10); openForm._refresh(); });
+    ga.appendChild(d);
   });
-  // 역량
-  const ca = document.getElementById('compArea');
-  ca.innerHTML = '';
-  COMPS.forEach((c,i)=>{
-    const row = document.createElement('div');
-    row.className = 'comp-row';
-    row.innerHTML = `<div class="c-name">${c[0]}</div><div class="c-desc">${c[1]}</div>`;
-    row.appendChild(scaleButtons(t.comp[i], v=>{ t.comp[i]=v; if(t.status==='none')t.status='draft'; openForm(t); }));
-    ca.appendChild(row);
+  const ca = $('compArea'); ca.innerHTML='';
+  cur.competencies.forEach((c)=>{
+    const r=document.createElement('div'); r.className='comp-row';
+    r.innerHTML=`<div class="c-name">${c.itemName}</div><div class="c-desc">${c.description||''}</div>${scaleHtml(c.score)}`;
+    r.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ c.score=parseInt(b.dataset.v,10); openForm._refresh(); });
+    ca.appendChild(r);
   });
-  // 종합
-  const ts = totalScore(t);
-  document.getElementById('totalScore').textContent = f1(ts);
-  document.getElementById('gradeChip').textContent = grade(ts);
-  document.getElementById('overallComment').value = t.comment || '';
+  $('overallComment').value = cur.overallComment || '';
+  recalc();
   show('form');
 }
-document.getElementById('overallComment').oninput = e=>{ if(current) current.comment = e.target.value; };
-document.getElementById('saveDraftBtn').onclick = ()=>{
-  if(!current) return;
-  if(current.status!=='done') current.status='draft';
-  alert('임시저장 되었습니다. (데모)');
-  renderList(); show('list');
-};
-document.getElementById('submitBtn').onclick = ()=>{
-  if(!current) return;
-  const missP = current.perf.some(x=>x==null);
-  const missC = current.comp.some(x=>x==null);
-  if(missP || missC){ alert('모든 항목을 평가해야 제출할 수 있습니다.'); return; }
-  if(!current.comment.trim()){ alert('종합 의견을 입력해주세요.'); return; }
-  current.status='done';
-  alert(`${current.name}님 평가가 제출되었습니다. (데모)`);
-  renderList(); show('list');
-};
-
-/* ───────── 관리자 ───────── */
-function renderAdmin(){
-  const total = targets.length;
-  const done = targets.filter(t=>t.status==='done').length;
-  const draft = targets.filter(t=>t.status==='draft').length;
-  const none = targets.filter(t=>t.status==='none').length;
-  kTotal.textContent = total; kDone.textContent = done;
-  kDraft.textContent = draft; kNone.textContent = none;
-  const pct = Math.round(done/total*100);
-  document.getElementById('overallPct').textContent = `전체 진행률 ${pct}%`;
-  document.getElementById('overallBar').style.width = pct + '%';
-
-  // 평가자별
-  const evals = [...new Set(targets.map(t=>t.evaluator))];
-  const tb = document.getElementById('evaluatorRows');
-  tb.innerHTML = '';
-  evals.forEach(ev=>{
-    const mine = targets.filter(t=>t.evaluator===ev);
-    const d = mine.filter(t=>t.status==='done').length;
-    const pending = mine.filter(t=>t.status!=='done').map(t=>t.name);
-    const p = Math.round(d/mine.length*100);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><b>${ev}</b></td>
-      <td>${mine.length}명</td>
-      <td><div class="pb"><div class="mini-bar"><i style="width:${p}%"></i></div><span class="pct">${d}/${mine.length} (${p}%)</span></div></td>
-      <td class="pending-names">${pending.length? pending.join(', ') : '<span style="color:#5B7A65">완료 ✓</span>'}</td>
-      <td>${pending.length? '<button class="nudge">독촉 알림</button>':''}</td>`;
-    const nb = tr.querySelector('.nudge');
-    if(nb) nb.onclick = ()=>alert(`${ev}님께 미제출 알림을 발송했습니다. (데모 — 실제로는 이메일/알림 발송)`);
-    tb.appendChild(tr);
-  });
-
-  // 등급 분포
-  const dist = {S:0,A:0,B:0,C:0,D:0};
-  const doneT = targets.filter(t=>t.status==='done');
-  doneT.forEach(t=>{ dist[grade(totalScore(t))]++; });
-  const max = Math.max(1,...Object.values(dist));
-  const dc = document.getElementById('distChart');
-  dc.innerHTML = '';
-  Object.entries(dist).forEach(([g,n])=>{
-    const bar = document.createElement('div');
-    bar.className = 'bar' + (n===max && n>0 ? ' top':'');
-    bar.innerHTML = `<i style="height:${Math.round(n/max*80)}%"></i><span class="g">${g}</span><span class="n">${n}명</span>`;
-    dc.appendChild(bar);
-  });
-
-  // 결과 테이블
-  const rr = document.getElementById('resultRows');
-  rr.innerHTML = '';
-  doneT.forEach(t=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td><b>${t.name}</b> <span class="muted">${t.dept}</span></td>
-      <td>${f1(perfScore(t))}</td><td>${f1(compScore(t))}</td>
-      <td><b>${f1(totalScore(t))}</b></td><td><b>${grade(totalScore(t))}</b></td>`;
-    rr.appendChild(tr);
-  });
-  if(!doneT.length) rr.innerHTML = '<tr><td colspan="5" class="muted">제출된 평가가 없습니다.</td></tr>';
+openForm._refresh = ()=>openForm(cur.id);  // 점수 클릭 시 다시 그려 하이라이트+점수 갱신
+function recalc(){
+  const p=calcPerf(cur.goals), c=calcComp(cur.competencies);
+  const t=(p!=null&&c!=null)? p*W_PERF+c*W_COMP : null;
+  $('totalScore').textContent=f2(t); $('gradeChip').textContent=gradeOf(t);
 }
+$('overallComment').oninput = e=>{ if(cur) cur.overallComment=e.target.value; };
 
-/* CSV 다운로드 (실동작) */
-document.getElementById('csvBtn').onclick = ()=>{
-  const rows = [['이름','부서','직급','평가자','상태','업적','역량','종합','등급']];
-  targets.forEach(t=>{
-    rows.push([t.name,t.dept,t.pos,t.evaluator,stMeta[t.status][0],
-      f1(perfScore(t)),f1(compScore(t)),f1(totalScore(t)),grade(totalScore(t))]);
-  });
-  const csv = '﻿' + rows.map(r=>r.join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download = '평가결과_2026상반기.csv';
-  a.click();
+async function saveTarget(status){
+  const body = {
+    goals: cur.goals.map(g=>({id:g.id, score:g.score})),
+    competencies: cur.competencies.map(c=>({itemName:c.itemName, score:c.score})),
+    overallComment: cur.overallComment || '',
+    status
+  };
+  await api(`/api/targets/${cur.id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+}
+$('saveDraftBtn').onclick = async ()=>{
+  await saveTarget(cur.status==='DONE'?'DONE':'DRAFT');
+  alert('임시저장 되었습니다.'); enterEvaluator();
+};
+$('submitBtn').onclick = async ()=>{
+  if(cur.goals.some(g=>g.score==null) || cur.competencies.some(c=>c.score==null)){ alert('모든 항목을 평가해야 제출할 수 있습니다.'); return; }
+  if(!(cur.overallComment||'').trim()){ alert('종합 의견을 입력해주세요.'); return; }
+  await saveTarget('DONE');
+  alert(`${cur.name}님 평가가 제출되었습니다.`); enterEvaluator();
 };
 
-/* ───────── 시작 ───────── */
-renderList();
-show('list');
+/* 관리자 */
+let lastSummary=null;
+async function enterAdmin(){
+  show('admin');
+  const s = await api(`/api/companies/${companyId}/summary`); lastSummary=s;
+  $('kTotal').textContent=s.total; $('kDone').textContent=s.done; $('kDraft').textContent=s.draft; $('kNone').textContent=s.none;
+  $('overallPct').textContent=`전체 진행률 ${s.pct}%`; $('overallBar').style.width=s.pct+'%';
+  $('evaluatorRows').innerHTML = s.byEvaluator.map(e=>{
+    const p=e.total?Math.round(e.done/e.total*100):0;
+    const pend=(e.pending&&e.pending.length)? e.pending.join(', ') : '<span style="color:#5B7A65">완료 ✓</span>';
+    return `<tr><td><b>${e.evaluator}</b></td><td>${e.total}명</td>
+      <td><div class="pb"><div class="mini-bar"><i style="width:${p}%"></i></div><span class="pct">${e.done}/${e.total} (${p}%)</span></div></td>
+      <td class="pending-names">${pend}</td></tr>`;
+  }).join('');
+  const dist=s.distribution; const max=Math.max(1,...Object.values(dist));
+  $('distChart').innerHTML = Object.entries(dist).map(([g,n])=>`
+    <div class="bar ${n===max&&n>0?'top':''}"><i style="height:${Math.round(n/max*80)}%"></i><span class="g">${g}</span><span class="n">${n}명</span></div>`).join('');
+  $('resultRows').innerHTML = s.results.length? s.results.map(r=>`
+    <tr><td><b>${r.name}</b> <span class="muted">${r.dept}</span></td><td>${f2(r.perfScore)}</td><td>${f2(r.compScore)}</td><td><b>${f2(r.totalScore)}</b></td><td><b>${r.grade}</b></td></tr>`).join('')
+    : '<tr><td colspan="5" class="muted">제출된 평가가 없습니다.</td></tr>';
+}
+$('csvBtn').onclick = ()=>{
+  if(!lastSummary) return;
+  const rows=[['피평가자','부서','평가자','업적','역량','종합','등급']];
+  lastSummary.results.forEach(r=>rows.push([r.name,r.dept,r.evaluatorName,f2(r.perfScore),f2(r.compScore),f2(r.totalScore),r.grade]));
+  const csv='﻿'+rows.map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='평가결과.csv'; a.click();
+};
+
+/* 슈퍼어드민 */
+async function enterSuper(){
+  show('super');
+  const list = await api('/api/admin/companies');
+  $('companyAdmin').innerHTML='';
+  list.forEach(co=>{
+    const card=document.createElement('div'); card.className='co-card';
+    let h=`<div class="co-name">${co.name}</div>`;
+    co.types.forEach(t=>{
+      h+=`<label class="type-toggle"><input type="checkbox" data-co="${co.id}" data-type="${t.evalType}" ${t.enabled?'checked':''}> ${TYPE_LABEL[t.evalType]||t.evalType}</label>`;
+    });
+    card.innerHTML=h;
+    card.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=async()=>{
+      await api(`/api/admin/companies/${cb.dataset.co}/types`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({[cb.dataset.type]:cb.checked})});
+      companies = await api('/api/companies'); // 셀렉터 최신화
+    });
+    $('companyAdmin').appendChild(card);
+  });
+}
+$('addCoBtn').onclick = async ()=>{
+  const name=$('newCoName').value.trim(); if(!name){ alert('회사명을 입력하세요.'); return; }
+  await api('/api/admin/companies',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});
+  $('newCoName').value='';
+  const sel=$('companySelect'); companies=await api('/api/companies');
+  sel.innerHTML=companies.map(c=>`<option value="${c.id}">${c.name}</option>`).join(''); sel.value=companyId;
+  enterSuper();
+};
+
+init();
 </script>
 </body>
 </html>
