@@ -19,6 +19,9 @@ jobs:
   claude:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Claude 액션이 브랜치 생성/푸시할 수 있도록 전체 히스토리 체크아웃
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
