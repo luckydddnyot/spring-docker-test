@@ -276,27 +276,30 @@ function scaleHtml(value){
   return h+'</div>';
 }
 async function openForm(id){
-  cur = await api(`/api/targets/${id}`);
+  cur = await api(`/api/targets/${id}`);   // 최초 진입 때만 서버에서 로드
+  renderForm();
+  show('form');
+}
+// 클릭 시에는 서버 재호출 없이 메모리(cur)만 바꿔 다시 그린다 (저장은 임시저장/제출 때만)
+function renderForm(){
   $('formWho').innerHTML = `${cur.name} <span>${cur.dept} · ${cur.position} · 평가자: ${cur.evaluatorName} · ${TYPE_LABEL[cur.evalType]||cur.evalType}</span>`;
   const ga = $('goalArea'); ga.innerHTML='';
   cur.goals.forEach((g,i)=>{
     const d=document.createElement('div'); d.className='goal';
     d.innerHTML=`<div class="g-top"><span class="g-title">${i+1}. ${g.title}</span><span class="g-w">가중치 ${g.weight}%</span></div>${scaleHtml(g.score)}`;
-    d.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ g.score=parseInt(b.dataset.v,10); openForm._refresh(); });
+    d.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ g.score=parseInt(b.dataset.v,10); renderForm(); });
     ga.appendChild(d);
   });
   const ca = $('compArea'); ca.innerHTML='';
   cur.competencies.forEach((c)=>{
     const r=document.createElement('div'); r.className='comp-row';
     r.innerHTML=`<div class="c-name">${c.itemName}</div><div class="c-desc">${c.description||''}</div>${scaleHtml(c.score)}`;
-    r.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ c.score=parseInt(b.dataset.v,10); openForm._refresh(); });
+    r.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ c.score=parseInt(b.dataset.v,10); renderForm(); });
     ca.appendChild(r);
   });
   $('overallComment').value = cur.overallComment || '';
   recalc();
-  show('form');
 }
-openForm._refresh = ()=>openForm(cur.id);  // 점수 클릭 시 다시 그려 하이라이트+점수 갱신
 function recalc(){
   const p=calcPerf(cur.goals), c=calcComp(cur.competencies);
   const t=(p!=null&&c!=null)? p*W_PERF+c*W_COMP : null;
