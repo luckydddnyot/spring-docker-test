@@ -1,0 +1,33 @@
+name: Deploy to Cloud Run
+
+# main 브랜치에 push될 때마다 자동 실행
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      # GitHub 시크릿(GCP_SA_KEY)에 저장한 서비스계정 키로 GCP 인증
+      - name: GCP 인증
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: gcloud 설치
+        uses: google-github-actions/setup-gcloud@v2
+
+      # 소스에서 빌드 + Cloud Run 배포 (DB 접속정보 주입, 비번은 Secret Manager 참조)
+      - name: Cloud Run 배포
+        run: |
+          gcloud run deploy demo \
+            --source . \
+            --project=spring-docker-test-500406 \
+            --region=asia-northeast3 \
+            --allow-unauthenticated \
+            --set-env-vars "SPRING_DATASOURCE_URL=jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require,SPRING_DATASOURCE_USERNAME=postgres.tjovpanugutyruxdzivi" \
+            --set-secrets "SPRING_DATASOURCE_PASSWORD=db-password:latest"
