@@ -26,11 +26,7 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
     }
 
-    @GetMapping("/")
-    public String hello() {
-        return "Hello from Cloud Run! 🚀  (Spring Boot 컨테이너가 정상 동작 중)";
-    }
-
+    // 2026-06-24: 루트("/")는 평가 웹페이지(static/index.html)가 서빙하도록 인사말 매핑 제거
     @GetMapping("/health")
     public String health() {
         return "OK";
