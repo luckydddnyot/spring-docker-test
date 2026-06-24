@@ -52,6 +52,40 @@ public class EvaluationController {
         return out;
     }
 
+    @PostMapping("/companies/{cid}/evaluatees")
+    public Map<String, Object> createEvaluatee(@PathVariable Long cid, @RequestBody CreateRequest req) {
+        Evaluatee e = new Evaluatee();
+        e.setCompanyId(cid);
+        e.setEvalType(req.evalType);
+        e.setName(req.name);
+        e.setDept(req.dept);
+        e.setPosition(req.position);
+        e.setEvaluatorName(req.evaluatorName);
+        e.setStatus("NONE");
+        evaluateeRepo.save(e);
+
+        int weightSum = 0;
+        if (req.goals != null) {
+            int order = 1;
+            for (CreateRequest.GoalDef g : req.goals) {
+                Goal goal = new Goal();
+                goal.setEvaluateeId(e.getId());
+                goal.setTitle(g.title);
+                goal.setWeight(g.weight);
+                goal.setSortOrder(order++);
+                goalRepo.save(goal);
+                if (g.weight != null) weightSum += g.weight;
+            }
+        }
+
+        Map<String, Object> out = new HashMap<>();
+        out.put("id", e.getId());
+        if (weightSum != 100) {
+            out.put("warning", "가중치 합계가 " + weightSum + "% 입니다. (권장: 100%)");
+        }
+        return out;
+    }
+
     @GetMapping("/companies/{cid}/targets")
     public List<Map<String, Object>> targets(@PathVariable Long cid,
                                              @RequestParam(required = false) String evaluator) {
@@ -232,5 +266,17 @@ public class EvaluationController {
 
         public static class GoalScore { public Long id; public Integer score; }
         public static class CompScore { public String itemName; public Integer score; }
+    }
+
+    /** 피평가자 등록 요청 본문 */
+    public static class CreateRequest {
+        public String evalType;
+        public String name;
+        public String dept;
+        public String position;
+        public String evaluatorName;
+        public List<GoalDef> goals;
+
+        public static class GoalDef { public String title; public Integer weight; }
     }
 }
