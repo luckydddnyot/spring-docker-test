@@ -13,6 +13,7 @@ permissions:
   contents: write        # 코드 수정/커밋
   pull-requests: write   # PR 생성/수정
   issues: write          # 이슈 응답
+  id-token: write        # Claude 액션 OIDC 인증(필수)
 
 jobs:
   claude:
